@@ -1,12 +1,8 @@
 Attribute VB_Name = "SpecialFolderModule"
-'This module contains the Special Folders example program.
+'This module contains this program's core procedures.
 Option Explicit
 
-'Miscellaneous constants.
-Private Const CSIDL_FLAG_CREATE As Long = &H8000  'Indicates that the path being refered should be created if it does not exist.
-Private Const MAX_PATH As Long = 260              'The maximum length allowed for a path.
-
-'The Microsoft Windows CSIDL constants.
+'The Microsoft Windows API functions used by this program.
 Private Const CSIDL_ADMINTOOLS As Long = &H30
 Private Const CSIDL_ALTSTARTUP As Long = &H1D
 Private Const CSIDL_APPDATA As Long = &H1A
@@ -33,6 +29,7 @@ Private Const CSIDL_DESKTOP As Long = &H0
 Private Const CSIDL_DESKTOPDIRECTORY As Long = &H10
 Private Const CSIDL_DRIVES As Long = &H11
 Private Const CSIDL_FAVORITES As Long = &H6
+Private Const CSIDL_FLAG_CREATE As Long = &H8000
 Private Const CSIDL_FLAG_DONT_VERIFY As Long = &H4000
 Private Const CSIDL_FONTS As Long = &H14
 Private Const CSIDL_HISTORY As Long = &H22
@@ -66,13 +63,11 @@ Private Const CSIDL_STARTUP As Long = &H7
 Private Const CSIDL_SYSTEM As Long = &H25
 Private Const CSIDL_TEMPLATES As Long = &H15
 Private Const CSIDL_WINDOWS As Long = &H24
+Private Const MAX_PATH As Long = 260
 
-'The Microsoft Windows API functions used by this program.
 Private Declare Sub CoTaskMemFree Lib "Ole32.dll" (ByVal pvoid As Long)
-Private Declare Function SHGetPathFromIDListA Lib "Shell32.dll" (ByVal Pidl As Long, ByVal pszPath As String) As Long
-Private Declare Function SHGetSpecialFolderLocation Lib "Shell32.dll" (ByVal hWnd As Long, ByVal nFolder As Long, ppidl As Long) As Long
-
-
+Private Declare Function SHGetFolderLocation Lib "Shell32.dll" (ByVal hwndOwner As Long, ByVal nFolder As Long, ByVal hToken As Long, ByVal dwReserved As Long, pidl As Long) As Long
+Private Declare Function SHGetPathFromIDListA Lib "Shell32.dll" (ByVal pidl As Long, ByVal pszPath As String) As Long
 
 'This procedure is executed when this program is started.
 Private Sub Main()
@@ -87,7 +82,7 @@ Dim PidlListOut As Long
 Dim ReturnValue As Long
 
    Path = Space$(MAX_PATH)
-   ReturnValue = SHGetSpecialFolderLocation(CLng(0), CSIDL, PidlListOut)
+   ReturnValue = SHGetFolderLocation(CLng(0), CSIDL, CLng(0), CLng(0), PidlListOut)
    If ReturnValue = 0 Then ReturnValue = SHGetPathFromIDListA(PidlListOut, Path)
    CoTaskMemFree PidlListOut
    
